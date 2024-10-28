@@ -11,3 +11,4 @@ cd myproject
 # Создаем приложение для пользователей
 python manage.py startapp users
 
+# readme-file
