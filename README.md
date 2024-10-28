@@ -10,3 +10,7 @@ cd myproject
 
 ### Создаем приложение для пользователей
 python manage.py startapp users
+
+# 2. Настроить проекта
+### В файле myproject/settings.py добавьте rest_framework, rest_framework.authtoken, и приложение users в INSTALLED_APPS:
+
