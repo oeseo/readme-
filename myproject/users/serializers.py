@@ -6,9 +6,9 @@ class PositionSerializer(serializers.ModelSerializer):
         model = Position
         fields = ['id', 'name']
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    position = PositionSerializer()
+class UserSerializer(serializers.ModelSerializer):
+    position = PositionSerializer(read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'full_name', 'position', 'is_dismissed', 'dismissal_date']
+        fields = ['id', 'username', 'full_name', 'position', 'is_dismissed', 'dismissed_date']    

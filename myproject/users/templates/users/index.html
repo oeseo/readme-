@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список пользователей</title>
+    <title>User List</title>
 </head>
 <body>
-    <h1>Пользователи</h1>
+    <h1>Список пользователей</h1>
     <table border="1">
         <thead>
             <tr>
@@ -14,30 +14,95 @@
                 <th>Должность</th>
                 <th>Уволен</th>
                 <th>Дата увольнения</th>
+                <th>Действия</th>
             </tr>
         </thead>
-        <tbody id="userTable"></tbody>
+        <tbody id="user-table-body">
+            <!-- JavaScript will populate this area -->
+        </tbody>
     </table>
 
+    <!-- Добавим кнопки для фильтрации пользователей -->
+    <button onclick="fetchUsers(false)">Показать неуволенных пользователей</button>
+    <button onclick="fetchUsers(true)">Показать уволенных пользователей</button>
+
+    <!-- Скрипт для получения и отображения данных -->
     <script>
-        async function loadUsers() {
-            const response = await fetch('/api/users/');
-            const users = await response.json();
-            const userTable = document.getElementById('userTable');
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMDIyMDE0MiwiaWF0IjoxNzMwMTMzNzQyLCJqdGkiOiI5Y2E1MjNjZWIyMWE0ZWM2YWVlOGZmMTlkZmFhNWIxNiIsInVzZXJfaWQiOjF9.h-bo6OVkxKhCw0uE47bjEQSD3jwQrCCnTJTfcHu8W50","access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMwMTM0MDQyLCJpYXQiOjE3MzAxMzM3NDIsImp0aSI6IjQ4MzA1NWQ5NGMzNDQ2NzFiOTZjOWUxOTUxYzk5M2Q4IiwidXNlcl9pZCI6MX0.5Y26BrqeNw-QBew_PucuA01Dn1fkN2M-EcgH-q2pK5U";  // Вставьте сюда токен аутентификации
+
+        // Функция для загрузки пользователей с фильтрацией по статусу "уволен" или "не уволен"
+        async function fetchUsers(isDismissed) {
+            try {
+                const response = await fetch(`/api/users/?is_dismissed=${isDismissed}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка: ${response.status}`);
+                }
+
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                console.error('Ошибка при загрузке пользователей:', error);
+            }
+        }
+
+        // Функция для отображения пользователей в таблице
+        function displayUsers(users) {
+            const tableBody = document.getElementById('user-table-body');
+            tableBody.innerHTML = '';  // Очистить текущие строки
 
             users.forEach(user => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${user.full_name}</td>
                     <td>${user.position.name}</td>
-                    <td>${user.is_dismissed}</td>
-                    <td>${user.dismissal_date || ''}</td>
+                    <td>${user.is_dismissed ? 'Да' : 'Нет'}</td>
+                    <td>${user.dismissed_date || '—'}</td>
+                    <td>
+                        <button onclick="editUser(${user.id})">Редактировать</button>
+                        <button onclick="deleteUser(${user.id})">Удалить</button>
+                    </td>
                 `;
-                userTable.appendChild(row);
+                tableBody.appendChild(row);
             });
         }
 
-        loadUsers();
+        // Функция для редактирования пользователя
+        function editUser(userId) {
+            // Добавьте функциональность для редактирования пользователя
+            alert(`Редактирование пользователя с ID ${userId}`);
+        }
+
+        // Функция для удаления пользователя
+        async function deleteUser(userId) {
+            try {
+                const response = await fetch(`/api/users/${userId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка: ${response.status}`);
+                }
+
+                // Удалить пользователя из таблицы после успешного удаления на сервере
+                fetchUsers(false);  // Обновить список пользователей
+            } catch (error) {
+                console.error('Ошибка при удалении пользователя:', error);
+            }
+        }
+
+        // Загрузить всех неуволенных пользователей при загрузке страницы
+        window.onload = () => fetchUsers(false);
     </script>
 </body>
 </html>
