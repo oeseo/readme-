@@ -23,4 +23,7 @@ python manage.py startapp users
 # 5. Создать API представлений
 ### В файле users/views.py создайте API для работы с пользователями
 
+# 6. Настроть маршрутов
+### В файле users/urls.py настройте маршруты для API и в myproject/urls.py подключите users.urls
+
 
