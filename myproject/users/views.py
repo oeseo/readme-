@@ -19,4 +19,13 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
 
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update']:
+            permission_classes = [IsAuthenticated]
+        elif self.action == 'destroy':
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
 # Create your views here.
